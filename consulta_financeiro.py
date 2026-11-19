@@ -7,22 +7,20 @@ arquivo = Path(__file__).resolve().parent / "vendas.parquet"
 
 # Conecta ao DuckDB
 conexao = duckdb.connect()
-
-# Verifica se existem vendas com valores invalidos
+# Verifica se existem vendas com valores invalidos e IDs nulos
 quantidade_invalidos = conexao.execute(
     """
     SELECT COUNT(*)
     FROM read_parquet(?)
-    WHERE valor <= 0 OR valor IS NULL
+    WHERE valor <= 0 OR valor IS NULL OR id_venda IS NULL
     """,
     [str(arquivo)]
 ).fetchone()[0]
 
 if quantidade_invalidos > 0:
     raise ValueError(
-        "Consulta bloqueada: existem vendas com valores invalidos."
+        "Consulta bloqueada: existem vendas com valores invalidos ou IDs nulos."
     )
-
 # Verifica se existem IDs de vendas duplicados
 quantidade_duplicados = conexao.execute(
     """

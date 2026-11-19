@@ -49,6 +49,19 @@ if not duplicados:
 else:
     print("ATENCAO: Foram encontrados IDs duplicados.")
     print(duplicados)
+# Verifica vendas com identificadores nulos
+ids_nulos = conexao.execute(
+    """
+    SELECT COUNT(*)
+    FROM read_parquet(?)
+    WHERE id_venda IS NULL
+    """,
+    [str(arquivo)]
+).fetchone()[0]
 
+if ids_nulos == 0:
+    print("QUALIDADE OK: Nenhum ID de venda nulo.")
+else:
+    print(f"ATENCAO: Foram encontrados {ids_nulos} IDs nulos.")
 
 conexao.close()
